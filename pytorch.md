@@ -45,7 +45,7 @@ pip install pandas matplotlib notebook
 
 
 
-## 二. 快速入门
+## 二. 快速入门---简要介绍
 
 ### 2.1 tensor--张量
 
@@ -89,7 +89,8 @@ x = torch.ones_like(t) # 全1，维度大小和t一样
 ```python
 t.device # tensor的位置
 torch.cuda.is_available() # GPU可用？
-t.to('cuda') # 将tensor移到显存
+t.to('cuda') # 将tensor移到显存 
+t = t.cuda() # 另一种写法
 ```
 
 #### 2.1.5 tensor的运算
@@ -119,7 +120,6 @@ t1.min().item() # 转化为python 浮点数
 
 
 # numpy -> tensor
-
 t = torch.form_numpy(np_a)
 # tensor -> numpy
 t.numpy()
@@ -141,9 +141,10 @@ y = tt + 1
 y.grad_fn # 输出add，表示tensor是由add运算来的
 
 
-out = y.mean() # 得到标量
+out = y.mean() # 得到标量，平均值
+out.backward() # 反向传播
 tt.grad # 计算梯度
-
+tt.grad.data.zero_() # 梯度清0
 
 #-------------------------------#
 # 不跟踪，也就是想打印某些值的时候
@@ -164,14 +165,7 @@ out = y.detach() #之后运用out的运算是不被跟踪的，表示到此为�
 
 ![image-20220531154820468](C:\Users\xiu\AppData\Roaming\Typora\typora-user-images\image-20220531154820468.png)
 
-### 2.2 逻辑回归与二元分类
-
-#### 2.2.1 交叉熵损失--二元
-
-作用：放大损失
-
-```python
-```
+### 2.2 神经网络
 
 
 
