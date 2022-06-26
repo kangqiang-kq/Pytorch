@@ -43,9 +43,16 @@ pip install pandas matplotlib notebook
 控制台：jupyter notebook
 ```
 
+### 1.5 配置云GPU
+
+```
+AuToDL：pycharm配置运行环境即可，类似于虚拟环境的配置
+文件上传：使用FileZilla
+```
 
 
-## 二. 快速入门---简要介绍
+
+## 二. 快速入门
 
 ### 2.1 tensor--张量
 
@@ -163,11 +170,75 @@ out = y.detach() #之后运用out的运算是不被跟踪的，表示到此为�
 
 #### 2.1.7 总结
 
-![image-20220531154820468](C:\Users\xiu\AppData\Roaming\Typora\typora-user-images\image-20220531154820468.png)
+<img src="C:\Users\xiu\AppData\Roaming\Typora\typora-user-images\image-20220531154820468.png" alt="image-20220531154820468" style="zoom: 50%;" />
 
 ### 2.2 神经网络
 
+#### 2.2.1 激活函数
+
+激活函数为神经网络带来了非线性，可以解决非线性拟合问题，增强拟合度。
+
+常见的有：
+
+relu：f(x) = max(0,x)
+
+```
+torch.relu(input)
+```
+
+<img src="C:\Users\xiu\AppData\Roaming\Typora\typora-user-images\image-20220601200957919.png" alt="image-20220601200957919 " style="zoom: 33%;" />
+
+sigmoid：映射到0-1之间
+```
+torch.sigmoid(input)
+```
+<img src="C:\Users\xiu\AppData\Roaming\Typora\typora-user-images\image-20220601201147652.png" alt="image-20220601201147652" style="zoom: 50%;" />
 
 
 
+tanh：-1到1之间
+
+```
+torch.tanh(input)
+```
+
+<img src="C:\Users\xiu\AppData\Roaming\Typora\typora-user-images\image-20220601201529099.png" alt="image-20220601201529099" style="zoom:50%;" />
+
+### 2.3 多分类问题与通用训练函数
+
+####  2.3.1 softmax分类
+
+- 多分类问题
+- 每个样本都必须属于某一个类别，所有可能的样本都被覆盖
+- 得到属于每一个类别的概念值
+- 所有的概率相加为1
+
+```python
+# 计算交叉熵
+nn.CrossEntropyLoss() 
+nn.NLLLoss
+
+```
+
+#### 2.3.2 torchvisoin库
+
+- 提供常用额数据集、模型、转换函数等
+- 内置数据集用于测试学习和创建基准模型
+
+统一数据加载和处理类
+
+```python
+torch.utils.data.Dataset
+torch.utils.data.DataLoader
+# 代码模块化
+```
+
+MINIST手写识别(除了课程之外，应当参考论文进行学习)
+
+```python
+```
+
+
+
+### 2.4 基础部分综述
 
