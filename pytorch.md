@@ -206,7 +206,7 @@ torch.tanh(input)
 
 ### 2.3 多分类问题与通用训练函数
 
-####  2.3.1 softmax分类
+####  2.3.1 softmax分类 (?)
 
 - 多分类问题
 - 每个样本都必须属于某一个类别，所有可能的样本都被覆盖
@@ -217,7 +217,6 @@ torch.tanh(input)
 # 计算交叉熵
 nn.CrossEntropyLoss() 
 nn.NLLLoss
-
 ```
 
 #### 2.3.2 torchvisoin库
@@ -236,9 +235,125 @@ torch.utils.data.DataLoader
 MINIST手写识别(除了课程之外，应当参考论文进行学习)
 
 ```python
+import torch
+import torchvision as tv
+from torchvision.transforms import ToTensor
+# datasets 创建
+train_ds = tv.datasets.MNIST('data',train = True,transform = ToTensor(),download = True)
+test_ds = tv.datasets.MNIST('data',train = False,transform = ToTensor(),download = True)
+# ToTensor() (h,w,c) -> (c,h,w)
+
+# dataloader 创建
+train_dl = torch.utils.data.DataLoader(train_ds, batch_size = 32, shuffle = True)
+test_dl = torch.utils.data.DataLoader(test_ds, batch_size = 32)
+# torch.utils.data.DataLoader(datasets, batch_size,suffle) 数据集，一次迭代的大小，乱序
+
+imgs,labels = next(iter(train_dl))
+print(imgs.shape) # 查看图片的一个批次（batch_size）的维度
+
+
+# 模型创建
+from torch import nn
+class Model(nn.Module):
+    def __init__(self):
+        super().__init__()
+        # 定义模型的各个层次
+        self.linear_1 = nn.Linear(28*28,128)
+        self.linear_2 = nn.Linear(128,64)
+        self.linear_3 = nn.Linear(64,10)
+    def forward(self,x): 
+        # 定义处理过程
+        x = x.view(-1,1*28*28)
+        x = torch.relu(self.linear_1(x))
+        x = torch.relu(self.linear_2(x))
+        logits = self.linear_3(x) # 不进行激活，原因：torch.nn.CrossEntropyLoss()，计算CELoss需要的输入就是logits
+        return logits   
+
+# 训练一次的函数
+def train(dl,model,loss_fn,optimizer,device):
+    size = len(dl.dataset) # 图片的数量
+    # 需要多少步
+    iter = len(dl) # 在dl中设置了batch_size的大小，自动可以得出步
+    total_loss,total_acc = 0,0 #累加loss，预测正确的样本数
+    for x, y in dl: # 得到输入以及输出
+        x,y = x.to(device),y.to(device)
+        pred = model(x)
+        loss = loss_fn(pred,y) # 预测，真实
+
+        optimizer.zero_grad() # 清空梯度
+        loss.backward() # 反向传播
+        optimizer.step() # 梯度下降
+        
+        with torch.no_grad(): # 不跟踪梯度
+            total_acc += (pred.argmax(1) == y).type(torch.float).sum().item() # 累加计算正确的样本
+            total_loss += loss.item() # 累加批次loss
+    train_acc = total_acc / size
+    train_loss = total_loss / iter # 批次的平均loss
+    return train_acc,train_loss
+
+# 定义测试函数
+def test(dl,model,loss_fn,device):
+    size = len(dl.dataset) # 数量
+    iter = len(dl) # 多少批次
+    total_loss,total_acc = 0,0 #累加loss，预测正确的样本数
+    for x, y in dl: # 得到输入以及输出
+        x,y = x.to(device),y.to(device)
+        pred = model(x)
+        loss = loss_fn(pred,y) # 预测，真实
+        
+        total_acc += (pred.argmax(1) == y).type(torch.float).sum().item() # 累加计算正确的样本
+        total_loss += loss.item() # 累加批次loss
+    test_acc = total_acc / size
+    test_loss = total_loss / iter # 批次的平均loss
+    return test_acc,test_loss
+
+# 封装模型训练函数
+def fit(epochs,model,train_dl,test_dl,loss_fn,optimizer,device):
+    train_acc = []
+    train_loss = []
+    test_acc = []
+    test_loss = []
+    for epoch in range(epochs):
+        e_test_acc,e_test_loss = test(test_dl,model,loss_fn,device)
+        e_train_acc,e_train_loss = train(train_dl,model,loss_fn,optimizer,device)
+        train_acc.append(e_train_acc)
+        train_loss.append(e_train_loss)
+        
+        test_acc.append(e_test_acc)
+        test_loss.append(e_test_loss)
+        template = 'epoch:{:2d}, train_acc:{:.2f}, train_loss:{:.2f}, test_acc:{:.2f}, test_loss:{:.2f}'
+        print(template.format(epoch,e_train_acc,e_train_loss,e_test_acc,e_test_loss))
+    return train_acc,train_loss,test_acc,test_loss
+
+# 损失函数（loss_fn），模型初始化（model），模型参数（parameters），学习率（lr），优化器选择（optimizer）
+loss_fn = torch.nn.CrossEntropyLoss()
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+model = Model().to(device)
+parameters = model.parameters() # ()获取模型参数的方法
+lr = 0.001 # 学习率
+optimizer = torch.optim.SGD(parameters,lr) # 优化器，参数和lr
+epochs = 10
+# device gpu
+train_acc = []
+train_loss = []
+test_acc = []
+test_loss = []
+train_acc,train_loss,test_acc,test_loss = fit(epochs,model,train_dl,test_dl,loss_fn,optimizer,device)
 ```
 
 
 
-### 2.4 基础部分综述
+### 2.4 深度学习python绘图
 
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+plt.plot(range(epochs), train_acc, label = 'train loss') # x,y
+plt.plot(range(epochs), test_acc, label = 'test loss') # x,y
+plt.xlabel('epoch')
+plt.ylabel('acc')
+plt.legend() # 添加图例，label才能生效
+plt.savafig('loss.png') # 图像的保存
+```
+
+### 2.5 标题
