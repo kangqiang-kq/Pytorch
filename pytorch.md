@@ -6,7 +6,7 @@
 
 深度学习框架，简洁高效，易于上手，与python语法一致
 
-### 1.2环境
+### 1.2 环境
 
 miniconda：python + conda包管理，小型，够用！  https://docs.conda.io/en/latest/miniconda.html
 
@@ -15,6 +15,12 @@ anaconda：python + conda + 其他  https://www.anaconda.com/products/distributi
 pytorch：https://pytorch.org/get-started/locally/
 
 vc运行库：支持运行
+
+清华大学：
+
+```
+https://mirrors.tuna.tsinghua.edu.cn/
+```
 
 pip源修改 :
 
@@ -26,9 +32,37 @@ GPU环境
 
 ​	安装完anaconda或者miniconda
 
-​	安装pytorch，如图选择CUDA版本
+​	安装pytorch：
 
-![image-20220530153643013](C:\Users\xiu\AppData\Roaming\Typora\typora-user-images\image-20220530153643013.png)
+```
+pytorch 官网下载
+```
+
+
+
+删除pytorch
+
+```
+conda uninstall pytorch
+conda uninstall libtorch
+```
+
+conda源修改: （直接修改用户目录下的配置文件）
+
+```
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/pytorch/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/menpo/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/bioconda/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/msys2/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
+
+conda config --set show_channel_urls yes
+```
+
+
 
 ### 1.3 相关包安装
 
@@ -43,52 +77,81 @@ pip install pandas matplotlib notebook
 控制台：jupyter notebook
 ```
 
-### 1.5 配置云GPU
+### 1.5 本地配置云主机GPU环境
 
 ```
-AuToDL：pycharm配置运行环境即可，类似于虚拟环境的配置
-文件上传：使用FileZilla
+AuToDL：pycharm配置运行环境即可，类似于虚拟环境的配置（anaconda）
+文件上传：FileZilla
+```
+
+### 1.6 网络GPU
+
+```
+Kaggle notebook
+阿里云天池
 ```
 
 
 
 ## 二. 快速入门
 
-### 2.1 tensor--张量
+### 2.1 Tensor
 
-基于向量和矩阵的扩充，和numpy中的ndarray可以互相转换，共享共同的底层，无需要复制数据
+向量和矩阵的**扩充**，张量可以取描述任何维度的事物！
 
-![image-20220530211151222](C:\Users\xiu\AppData\Roaming\Typora\typora-user-images\image-20220530211151222.png)
+包括：类型，创建，属性，运算，操作，类型转换
 
-#### 2.1.1 如何创建一个tensor
+#### 2.1.1 创建
 
 ```python
 import torch
 import numpy as np
-#------------------------------------------------#
-#直接创建
-t = torch.tensor([1,2,3])
-#基于numpy创建
-np_array = np.arange(12).reshape(3,4) 
-t = torch.from_numpy(np_numpy)
-```
+t = torch.tensor([1,2,3]) # 直接创建
 
-#### 2.1.2 tensor的属性
+np_array = np.arange(12).reshape(3,4) # 基于numpy创建
+t = torch.from_numpy(np_numpy) # 转换
 
-```python
-t.dtype
-t.shape # 维度大小
-t.size()
-t.size(0) # 查看某一个维度的大小
-```
+torch.rand(1,1) # 0-1之间
+torch.randn(1,1) # 标准正态分布的伪随机数（均值为0，方差为1）
+torch.Tensor(2,2).uniform(-1,1) # -1 ~ 1均匀分布
 
-#### 2.1.3 特殊tensor构建
+t = torch.zeros(3,4) # 3 * 4 全 0
+t = torch.ones(3,4) # 3 * 4 全 1
 
-```python
-t = torch.zeros(3,4)
-t = torch.ones(3,4)
 x = torch.zeros_like(t) # 创建一个和t大小一样的全 0 tensor
 x = torch.ones_like(t) # 全1，维度大小和t一样
+
+a = linspace(0, 10, 4) # 取4个，0 - 10 等 间隔，包括 10
+a = torch.arange(0,10,1) # 0 - 10, 步长是1，不包括 10  LongTensor
+a = torch.randperm(10) # 0 - 9 排列随机的数 LongTensor
+```
+
+---
+
+```python
+# 对比numpy
+import numpy as np
+a = np.array([[1,2],[3,4]])
+zeros
+ones
+```
+
+
+
+#### 2.1.2 属性
+
+```python
+# t.dtype，device，layout
+
+t.shape # 属性，维度大小
+t.size() # 方法，获取维度
+t.size(0) # 方法，获取某一个维度的大小
+```
+
+#### 2.1.3 运算
+
+```python
+
 ```
 
 #### 2.1.4 其他
@@ -168,9 +231,7 @@ out = y.detach() #之后运用out的运算是不被跟踪的，表示到此为�
 
 ```
 
-#### 2.1.7 总结
 
-<img src="C:\Users\xiu\AppData\Roaming\Typora\typora-user-images\image-20220531154820468.png" alt="image-20220531154820468" style="zoom: 50%;" />
 
 ### 2.2 神经网络
 
@@ -186,27 +247,19 @@ relu：f(x) = max(0,x)
 torch.relu(input)
 ```
 
-<img src="C:\Users\xiu\AppData\Roaming\Typora\typora-user-images\image-20220601200957919.png" alt="image-20220601200957919 " style="zoom: 33%;" />
-
 sigmoid：映射到0-1之间
 ```
 torch.sigmoid(input)
 ```
-<img src="C:\Users\xiu\AppData\Roaming\Typora\typora-user-images\image-20220601201147652.png" alt="image-20220601201147652" style="zoom: 50%;" />
-
-
-
 tanh：-1到1之间
 
 ```
 torch.tanh(input)
 ```
 
-<img src="C:\Users\xiu\AppData\Roaming\Typora\typora-user-images\image-20220601201529099.png" alt="image-20220601201529099" style="zoom:50%;" />
-
 ### 2.3 多分类问题与通用训练函数
 
-####  2.3.1 softmax分类 (?)
+####  2.3.1 softmax分类 
 
 - 多分类问题
 - 每个样本都必须属于某一个类别，所有可能的样本都被覆盖
@@ -216,10 +269,9 @@ torch.tanh(input)
 ```python
 # 计算交叉熵
 nn.CrossEntropyLoss() 
-nn.NLLLoss
 ```
 
-#### 2.3.2 torchvisoin库
+#### 2.3.2 MNIST手写识别
 
 - 提供常用额数据集、模型、转换函数等
 - 内置数据集用于测试学习和创建基准模型
@@ -232,7 +284,7 @@ torch.utils.data.DataLoader
 # 代码模块化
 ```
 
-MINIST手写识别(除了课程之外，应当参考论文进行学习)
+MNIST手写识别(除了课程之外，应当参考论文进行学习（待）)
 
 ```python
 import torch
@@ -356,4 +408,28 @@ plt.legend() # 添加图例，label才能生效
 plt.savafig('loss.png') # 图像的保存
 ```
 
-### 2.5 标题
+### 2.5 基础部分总结
+
+```
+
+```
+
+
+
+## 三. 计算机视觉基础
+
+### 3.1 CNN
+
+卷积是对图像特征进行提取，并输出结果
+
+不同的卷积核对于图像特征的敏感度是不一样的
+
+### 3.2 CNN架构
+
+```
+卷积层：conv2d
+非线性层（激活层）：sigmiod / tanh / relu
+池化层：pooling2d
+全连接层：wx + b
+```
+
