@@ -408,12 +408,6 @@ plt.legend() # 添加图例，label才能生效
 plt.savafig('loss.png') # 图像的保存
 ```
 
-### 2.5 基础部分总结
-
-```
-
-```
-
 
 
 ## 三. 计算机视觉基础
@@ -432,4 +426,47 @@ plt.savafig('loss.png') # 图像的保存
 池化层：pooling2d
 全连接层：wx + b
 ```
+
+### 3.3 GPU
+
+```
+# 判断是否有GPU
+torch.cuda.is_available() 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+# 转移到GPU
+# 1. 模型放入GPU
+# 2. 数据放入GPU
+model = Model() # 实例化模型
+model.to(device)
+x.to(device)
+y.to(device)
+```
+
+### 3.4 代码(天气图片分类)
+
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import numpy as np
+import matplotlib.pyplot as plt # 绘图
+%matplotlib inline 
+import torchvision
+import os
+import shutil 
+
+torchvision.datasets.ImageFolder # 从分类文件夹中船舰dataset数据集
+base_dir = r'./datadir'
+if not os.path.isdir(base.dir): # 地址是否合法
+    os.mkdir(base_dir)
+    train_dir = os.path.join(base_dir, 'train')
+    test_dir = os.path.join(base_dir, 'test')
+    os.mkdir(train_dir)
+    os.mkdir(test_dir)
+ 
+specises = ['cloudy', 'rain', 'shine', 'sunrise']
+```
+
+
 
